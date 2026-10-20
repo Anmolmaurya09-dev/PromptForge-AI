@@ -1,0 +1,29 @@
+kind = "video"
+previewPath = "/promptforge-ai-film/"
+title = "PromptForge AI — Animated Intro"
+description = "A short animated film introducing PromptForge AI and its browser-local prompt optimization workflow."
+videoAspectRatio = "16:9"
+version = "1.0.0"
+id = "artifacts/promptforge-ai-film"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/promptforge-ai-film/" ]
+localPort = 22113
+
+[services.development]
+run = "pnpm --filter @workspace/promptforge-ai-film run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/promptforge-ai-film", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/promptforge-ai-film/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22113"
+BASE_PATH = "/promptforge-ai-film/"
