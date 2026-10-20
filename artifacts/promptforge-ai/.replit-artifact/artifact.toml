@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "PromptForge AI"
+description = "A privacy-first prompt optimizer that transforms rough ideas into polished prompts for ChatGPT, Claude, and Midjourney entirely in the browser."
+version = "1.0.0"
+id = "artifacts/promptforge-ai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21652
+
+[services.development]
+run = "pnpm --filter @workspace/promptforge-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/promptforge-ai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/promptforge-ai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21652"
+BASE_PATH = "/"

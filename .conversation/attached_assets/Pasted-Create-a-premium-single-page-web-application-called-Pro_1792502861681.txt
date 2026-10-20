@@ -1,0 +1,22 @@
+Create a premium, single-page web application called "PromptForge AI". The app must run 100% on the client side using clean HTML, CSS, and modern vanilla JavaScript. No backend, no databases, and absolutely no user signup/login are required.
+
+1. UI & DESIGN AESTHETIC:
+- Design a high-end, responsive dark mode theme using deep charcoals, slate grays, and electric purple or neon blue glowing accents (similar to modern premium SaaS tools like Linear or ChatGPT).
+- Center the main workspace on the screen with clean margins, ensuring it looks beautiful on both desktop and mobile browsers.
+
+2. CORE WORKSPACE (THREE-CLICK FLOW):
+- Input Field: A large, elegant text area labeled "1. Paste your raw, basic prompt here". Include a clear placeholder example.
+- AI Model Selector: A row of three distinct, beautifully designed toggle buttons labeled: "Optimize for ChatGPT", "Optimize for Claude", and "Optimize for Midjourney".
+- Primary Action Button: A prominent, glowing button labeled "Enhance Prompt". When clicked, it must run a local JavaScript function that takes the user's raw text and automatically wraps it into a highly structured, professional mega-prompt tailored to the selected AI (injecting role assignment, task constraints, output formatting rules, or stylistic modifiers).
+- Output Field: A read-only text area displaying the final optimized prompt. Directly below or inside it, place a prominent "Copy to Clipboard" button and a "Clear Workspace" button that both trigger smooth visual feedback when clicked.
+
+3. MONETIZATION & UTILITY PLACEHOLDERS:
+- Advanced Styling Toggles: Include a section with checkboxes or small toggles for "Advanced Frameworks" (e.g., Tone: Professional, Length: Concise, Structure: Step-by-Step, Expert Mode, Chain-of-Thought).
+- Visually mark "Expert Mode" and "Chain-of-Thought" with a premium lock icon. If clicked, open a clean modal popup that says: "Unlock Advanced Frameworks for this session by supporting the developer!" with a prominent button linking out to a Buy Me a Coffee page.
+- Ad Space Layout: Create two dedicated visual placeholder blocks (styled with light borders and subtle background fills) clearly labeled "Advertisement Space" — one positioned as a right-side panel and one as a bottom horizontal banner.
+
+4. COMPLIANCE FOOTER & MODAL POPUPS:
+- Create a clean footer at the bottom of the page with clickable links for: "Privacy Policy", "Terms of Service", "AI Disclosure", and "Send Feedback".
+- Pop-Up Modals: When a user clicks any footer link, it must open a beautifully animated pop-up modal directly inside the app containing the text. 
+- In the Privacy Policy and AI Disclosure modals, clearly state that the app is 100% privacy-first, processes all data completely locally inside the user's browser, and does not store or send text to external servers.
+- In the Feedback modal, create a simple, neat contact form interface. Add a "Buy Me a Coffee" icon button permanently visible in the bottom corner of the web screen.
