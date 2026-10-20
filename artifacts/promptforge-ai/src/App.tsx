@@ -189,7 +189,7 @@ function App() {
           kicker: 'A little extra room',
           title: 'Keep the work flowing',
           body: 'Unlock Advanced Frameworks for this session by supporting the developer! Expert Mode and Brief Rationale are premium options. If PromptForge has helped you get unstuck, a coffee helps support future improvements.',
-          action: <a className="modal-primary" href="https://www.buymeacoffee.com/" target="_blank" rel="noreferrer" data-testid="link-support-coffee"><Coffee /> Buy me a coffee</a>,
+          action: <a className="modal-primary" href="https://www.buymeacoffee.com/am_flowstudio" target="_blank" rel="noopener noreferrer" data-testid="link-support-coffee"><Coffee /> Buy me a coffee</a>,
         };
       case 'privacy':
         return {
@@ -342,13 +342,14 @@ function App() {
           <nav className="footer-links" aria-label="Footer">
             <button type="button" onClick={() => openFooterModal('privacy')} data-testid="link-privacy">Privacy Policy</button>
             <button type="button" onClick={() => openFooterModal('terms')} data-testid="link-terms">Terms of Service</button>
+            <a href="https://docu-flowai.netlify.app" target="_blank" rel="noopener noreferrer" data-testid="link-docu-flowai">Try docu_flowai</a>
             <button type="button" onClick={() => openFooterModal('disclosure')} data-testid="link-ai-disclosure">AI Disclosure</button>
             <button type="button" onClick={() => openFooterModal('feedback')} data-testid="link-feedback">Feedback</button>
           </nav>
         </div>
       </footer>
 
-      <a className="coffee-float" href="https://www.buymeacoffee.com/" target="_blank" rel="noreferrer" data-testid="link-buy-me-a-coffee"><Coffee /> Buy me a coffee</a>
+      <a className="coffee-float" href="https://www.buymeacoffee.com/am_flowstudio" target="_blank" rel="noopener noreferrer" data-testid="link-buy-me-a-coffee"><Coffee /> Buy me a coffee</a>
       {toast && <div className="toast-message" role="status" aria-live="polite" data-testid="status-toast">{toast}</div>}
 
       {modal && content && (
