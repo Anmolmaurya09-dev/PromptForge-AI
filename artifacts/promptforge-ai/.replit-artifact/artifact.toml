@@ -17,12 +17,8 @@ run = "pnpm --filter @workspace/promptforge-ai run dev"
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/promptforge-ai", "run", "build" ]
 serve = "static"
-publicDir = "artifacts/promptforge-ai/dist/public"
+publicDir = "dist"
 
 [[services.production.rewrites]]
 from = "/*"
 to = "/index.html"
-
-[services.env]
-PORT = "21652"
-BASE_PATH = "/"
