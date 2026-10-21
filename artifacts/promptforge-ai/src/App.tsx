@@ -406,7 +406,7 @@ function App() {
             <button type="button" onClick={() => openFooterModal('terms')} data-testid="link-terms">Terms of Service</button>
             <a href="https://docu-flowai.netlify.app" target="_blank" rel="noopener noreferrer" data-testid="link-docu-flowai">Try docu_flowai</a>
             <button type="button" onClick={() => openFooterModal('disclosure')} data-testid="link-ai-disclosure">AI Disclosure</button>
-            <button type="button" onClick={() => openFooterModal('feedback')} data-testid="link-feedback">Feedback</button>
+            <a href="https://tally.so/r/4aXDAX" target="_blank" rel="noopener noreferrer" data-testid="link-feedback">Feedback</a>
           </nav>
         </div>
       </footer>
