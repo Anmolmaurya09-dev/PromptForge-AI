@@ -25,60 +25,122 @@ type Preferences = { professional: boolean; concise: boolean; steps: boolean };
 
 const defaultPreferences: Preferences = { professional: true, concise: false, steps: false };
 
-function makePrompt(raw: string, target: Target, preferences: Preferences) {
-  const idea = raw.trim().replace(/\s+/g, ' ');
-  if (target === 'Midjourney') {
-    const artDirection = preferences.professional
-      ? 'polished art direction, intentional composition, refined and cohesive color palette'
-      : 'clear visual storytelling, expressive composition, considered color palette';
-    const detail = preferences.concise
-      ? 'clean focal point, crisp detail'
-      : 'rich material detail, layered atmosphere, carefully balanced light and shadow';
-    return `Create a compelling image of: ${idea}.
+function inferPersona(idea: string) {
+  const personaRules: Array<[RegExp, string]> = [
+    [/\b(code|coding|software|app|website|api|debug|bug|script|function|typescript|javascript|python|database|program)\b/i, 'a senior software engineer and pragmatic technical architect'],
+    [/\b(image|illustration|draw|visual|art|photo|photograph|logo|poster|render|cinematic|scene)\b/i, 'a visual art director with a strong eye for composition and image-making'],
+    [/\b(write|writing|draft|email|blog|copy|article|story|script|caption|newsletter|edit)\b/i, 'an expert writer and editor focused on clear, audience-aware communication'],
+    [/\b(research|analy[sz]e|compare|evaluate|evidence|sources|study|investigate)\b/i, 'a rigorous research analyst who distinguishes evidence from assumption'],
+    [/\b(plan|roadmap|schedule|launch|project|organize|strategy|milestone)\b/i, 'an experienced project strategist who turns goals into practical next steps'],
+    [/\b(teach|learn|explain|lesson|tutor|student|curriculum|study guide)\b/i, 'a patient educator who makes complex ideas easy to understand'],
+    [/\b(business|sales|marketing|revenue|customer|brand|growth)\b/i, 'a practical business strategist focused on useful, measurable outcomes'],
+  ];
 
-ART DIRECTION
-- ${artDirection}
-- ${detail}
-- Keep the main subject clear and visually distinct.
-- Avoid clutter, accidental text, logos, and unrelated objects.
+  return personaRules.find(([pattern]) => pattern.test(idea))?.[1]
+    ?? 'a capable subject-matter expert in the area described by the request';
+}
 
-COMPOSITION
-- Use a strong focal point with balanced negative space.
-- Frame the scene with a considered camera angle and depth.
+function makeChatGptPrompt(idea: string, preferences: Preferences) {
+  const tone = preferences.professional
+    ? 'Use a polished, professional, and direct tone.'
+    : 'Use a natural, approachable tone suited to the intended audience.';
+  const depth = preferences.concise
+    ? 'Be concise and prioritize the highest-value information.'
+    : 'Give enough detail, context, and practical guidance to make the result immediately useful.';
+  const structure = preferences.steps
+    ? 'Use an ordered sequence of steps with concise headings.'
+    : 'Use Markdown headings and scannable bullets where they improve clarity.';
 
-RENDERING
-- High-quality, editorial finish with natural texture and controlled contrast.
-- Aspect ratio 3:2; stylization 180.
+  return `ROLE / PERSONA
+Act as ${inferPersona(idea)}. Bring the expertise relevant to the request without claiming personal credentials or inventing experience.
 
-Midjourney parameters: --ar 3:2 --stylize 180`;
-  }
-  const voice = preferences.professional
-    ? 'Use a clear, professional, and direct tone.'
-    : 'Use a natural, approachable tone suited to the audience.';
-  const length = preferences.concise
-    ? 'Keep the response concise; prioritize the most useful details.'
-    : 'Be thorough and practical, with enough context to make the result immediately useful.';
-  const output = preferences.steps
-    ? 'Present the answer as an ordered, step-by-step sequence. Use concise headings where helpful.'
-    : 'Organize the answer with clear headings and scannable formatting. Include a concrete example when useful.';
-  const role = target === 'Claude'
-    ? 'Act as a thoughtful subject-matter expert and collaborative editor.'
-    : 'Act as a capable, detail-oriented subject-matter expert.';
-  return `${role}
+CONTEXT & BACKGROUND
+Treat the user's brief as the source of truth. Preserve its goal, named details, intended audience, and any constraints. Information not supplied is unknown; make only reasonable, clearly labeled assumptions.
 
-TASK
+USER'S ORIGINAL BRIEF
 ${idea}
 
-GUIDANCE
-- ${voice}
-- ${length}
-- Ask a brief clarifying question only if essential information is missing; otherwise state reasonable assumptions and proceed.
-- Avoid filler, unsupported claims, and repetition.
+TASK
+Fulfill the request directly. If a critical detail is missing, ask one focused clarifying question; otherwise proceed using the stated brief.
 
-OUTPUT FORMAT
-${output}
+CONSTRAINTS & RULES
+- ${tone}
+- ${depth}
+- Respect the audience, medium, and purpose implied by the brief.
+- Avoid filler, repetition, unsupported claims, and unnecessary jargon.
+- Do not add facts, requirements, or scope that the user did not provide.
 
-Deliver a useful, complete response focused on the task above.`;
+DESIRED OUTPUT FORMAT
+- ${structure}
+- Lead with the useful answer rather than a description of your process.
+- Include examples, a checklist, or a short summary only when they make the result more actionable.`;
+}
+
+function escapeXml(value: string) {
+  return value.replace(/[<>&"']/g, (character) => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    '"': '&quot;',
+    "'": '&apos;',
+  })[character] ?? character);
+}
+
+function makeClaudePrompt(idea: string, preferences: Preferences) {
+  const tone = preferences.professional
+    ? 'Maintain a professional, deeply analytical, and highly articulate writing tone.'
+    : 'Maintain a thoughtful, approachable, deeply analytical, and highly articulate writing tone.';
+  const depth = preferences.concise
+    ? 'Keep the final answer focused and economical while preserving the essential reasoning and nuance.'
+    : 'Explore relevant nuance and implications, then make the final answer thorough without repeating points.';
+  const format = preferences.steps
+    ? 'Organize the final answer as a clear sequence of steps, with headings where useful.'
+    : 'Use precise headings and well-structured paragraphs; use bullets when they improve readability.';
+
+  return `<system_instructions>
+You are ${inferPersona(idea)}. Follow the user's request carefully, reason with depth, and write with clarity, nuance, and precision.
+Before giving the final answer, think through the task step by step using <thinking>...</thinking> tags. Then present the answer using <final_answer>...</final_answer> tags.
+- ${tone}
+- ${depth}
+- Distinguish supplied facts from assumptions; do not fabricate details or sources.
+- Avoid filler, repetition, and unsupported claims.
+</system_instructions>
+
+<context>
+<user_request>${escapeXml(idea)}</user_request>
+Treat the request as the authoritative brief. Preserve its goal and constraints; infer only what is necessary to complete it.
+</context>
+
+<task>
+Fulfill the user's request directly. If a critical ambiguity prevents a reliable answer, ask one focused clarifying question; otherwise state any necessary assumption briefly and proceed.
+</task>
+
+<response_preferences>
+${format}
+Make the result useful, complete, and appropriately tailored to the request.
+</response_preferences>`;
+}
+
+function makeMidjourneyPrompt(idea: string, preferences: Preferences) {
+  const scene = idea.replace(
+    /^(?:please\s+)?(?:create|generate|make|draw|illustrate|show)\s+(?:me\s+)?(?:an?\s+)?(?:image|picture|photo|photograph|illustration|render|artwork|scene)\s+(?:of|showing|depicting)\s+/i,
+    '',
+  );
+  const artDirection = preferences.professional
+    ? 'refined cinematic art direction and a cohesive color palette'
+    : 'expressive visual storytelling and an imaginative color palette';
+  const detail = preferences.concise
+    ? 'a clean focal point, crisp subject detail, and uncluttered framing'
+    : 'layered environmental detail, tactile textures, and atmospheric depth';
+
+  return `/imagine prompt: A cinematic visual interpretation of ${scene}, ${artDirection}, ${detail}, strong focal point, balanced widescreen composition, dramatic but natural volumetric lighting, photorealistic, 8k resolution, hyper-detailed, shot on 35mm lens, realistic textures, subtle film grain --ar 16:9 --v 6.0`;
+}
+
+function makePrompt(raw: string, target: Target, preferences: Preferences) {
+  const idea = raw.trim().replace(/\s+/g, ' ');
+  if (target === 'Midjourney') return makeMidjourneyPrompt(idea, preferences);
+  if (target === 'Claude') return makeClaudePrompt(idea, preferences);
+  return makeChatGptPrompt(idea, preferences);
 }
 
 async function copyText(value: string) {
