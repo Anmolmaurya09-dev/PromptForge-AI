@@ -1,0 +1,5 @@
+{
+  "buildCommand": "pnpm install --no-frozen-lockfile && pnpm --filter @workspace/promptforge-ai... run build",
+  "outputDirectory": "artifacts/promptforge-ai/dist",
+  "installCommand": "pnpm install --no-frozen-lockfile"
+}
